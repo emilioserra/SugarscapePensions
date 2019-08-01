@@ -35,7 +35,7 @@ Before being retired, agents are taxed a percentage of the sugar retrieved in ea
 
 Other parameters include:
 
-*RANDOM-INITIAL-AGE, it gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
+* RANDOM-INITIAL-AGE, it gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
 * PRODUCTIVITY-DECAY, it makes agents to be able to recollect only part of the sugar in a patch based on a productivity-decay rate that depends on the age.  These values have been obtained using a univariate Akima interpolation over productivity values per age given in “Does Mental Productivity Decline with Age? Evidence from Chess Players” (2013) by Bertoni et al.
 
 
@@ -57,20 +57,20 @@ The LORENZ CURVE plot shows what percent of the wealth is held by what percent o
 
 ### Extended simulation 
 
-####Parameters
-The RETIREMENT-AGE slider states the age of retirement for agents.
-The  PENSION-TAXES slider states the percentage of sugar collected that goes to the pension piggy bank in each tick.
-RANDOM-INITIAL-AGE switch gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
-PRODUCTIVITY-DECAY switch makes agents to be able to recollect only part of the sugar in a patch based on a productivity-decay rate that depends on the age.  
-RESOURCES-OCUPPATION switch allows working agents to move to the positions where retired agents stay and collect the sugar.
-SOCIAL- SERVICES switch allows working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
+#### Parameters
+* The RETIREMENT-AGE slider states the age of retirement for agents.
+* The  PENSION-TAXES slider states the percentage of sugar collected that goes to the pension piggy bank in each tick.
+* RANDOM-INITIAL-AGE switch gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
+* PRODUCTIVITY-DECAY switch makes agents to be able to recollect only part of the sugar in a patch based on a productivity-decay rate that depends on the age.  
+* RESOURCES-OCUPPATION switch allows working agents to move to the positions where retired agents stay and collect the sugar.
+* SOCIAL- SERVICES switch allows working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
 
 
-####Outputs:
+#### Outputs:
 
-RETIREES VS WORKERS, plots the number of working agents per time in red and the number of retired agents in blue per time.
-PENSIONS PIGGY BANK, plots the amount of sugar per time in the pensions piggy bank.
-SOCIAL EXCLUSION, plots the working agents who run out of sugar in red, the retired agents who run out of sugar in blue, and the working agents that used social services in green.
+* RETIREES VS WORKERS, plots the number of working agents per time in red and the number of retired agents in blue per time.
+* PENSIONS PIGGY BANK, plots the amount of sugar per time in the pensions piggy bank.
+* SOCIAL EXCLUSION, plots the working agents who run out of sugar in red, the retired agents who run out of sugar in blue, and the working agents that used social services in green.
 
 ## THINGS TO NOTICE
 
@@ -81,6 +81,7 @@ After running the model for a while, the wealth distribution histogram shows tha
 Some agents will have less than the minimum initial wealth (MINIMUM-SUGAR-ENDOWMENT), if the minimum initial wealth was greater than 0.
 
 ### Extended simulation 
+
 Work in progress
 
 ## THINGS TO TRY
@@ -92,6 +93,7 @@ How does the initial population affect the wealth distribution? How long does it
 How is the wealth distribution affected when you change the initial endowments of wealth?
 
 ### Extended simulation 
+
 Work in progress.
 
 ## NETLOGO FEATURES
@@ -129,3 +131,5 @@ Copyright 2019 Emilio Serrano and Ken Satoh.
 This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
 
 Commercial licenses are also available. To inquire about commercial licenses, please contact Emilio Serrano  at https://emilioserra.oeg-upm.net/
+
+<!-- 2009 Cite: Li, J. -->
