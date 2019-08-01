@@ -34,6 +34,7 @@ In the simulation extension, agents can retired at certain age and they are disp
 Before being retired, agents are taxed a percentage of the sugar retrieved in each tick that go to the pension piggy bank. Moreover, if the SOCIAL- SERVICES parameter is activated,  working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
 
 Other parameters include:
+
 *RANDOM-INITIAL-AGE, it gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
 * PRODUCTIVITY-DECAY, it makes agents to be able to recollect only part of the sugar in a patch based on a productivity-decay rate that depends on the age.  These values have been obtained using a univariate Akima interpolation over productivity values per age given in “Does Mental Productivity Decline with Age? Evidence from Chess Players” (2013) by Bertoni et al.
 
