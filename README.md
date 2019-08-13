@@ -60,17 +60,18 @@ The LORENZ CURVE plot shows what percent of the wealth is held by what percent o
 #### Parameters
 * The RETIREMENT-AGE slider states the age of retirement for agents.
 * The  PENSION-TAXES slider states the percentage of sugar collected that goes to the pension piggy bank in each tick.
+* FIXED-FEE slider states a fixed fee of sugar to be paid in every tick to contribute to the pension piggy bank.
 * RANDOM-INITIAL-AGE switch gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
 * PRODUCTIVITY-DECAY switch makes agents to be able to recollect only part of the sugar in a patch based on a productivity-decay rate that depends on the age.  
 * RESOURCES-OCUPPATION switch allows working agents to move to the positions where retired agents stay and collect the sugar.
-* SOCIAL- SERVICES switch allows working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
+* SOCIAL-SERVICES switch allows working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
 
 
 #### Outputs:
 
 * RETIREES VS WORKERS, plots the number of working agents per time in red and the number of retired agents in blue per time.
 * PENSIONS PIGGY BANK, plots the amount of sugar per time in the pensions piggy bank.
-* SOCIAL EXCLUSION, plots the working agents who run out of sugar in red, the retired agents who run out of sugar in blue, and the working agents that used social services in green.
+* SOCIAL EXCLUSION, plots the working agents who run out of sugar in red, the retired agents who run out of sugar in blue.
 
 ## THINGS TO NOTICE
 
@@ -120,6 +121,17 @@ For more explanation of the Lorenz curve and the Gini index, see the Info tab of
 
 
 ## HOW TO CITE
+Authors: 
+
+*  Emilio Serrano from the Ontology Engineering Group, Deparment of Artificial Intelligence, Universidad Politécnica de Madrid, Spain.
+*  Ken Satoh from Principles of Informatics Research Division, NII(National Institute of Informatics), and Sokendai (The Graduate University of Advanced Studies), Japan.
+ 
+<p align="center"> 
+<img src="https://www.upm.es/sfs/Rectorado/Gabinete%20del%20Rector/Logos/UPM/Escudo%20con%20Leyenda/ESCUDO%20leyenda%20color%20JPG.jpg" width="200">
+<br />
+<img src="https://www.realwire.com/writeitfiles/01_nii_logo_A.jpg" width="200">
+</p>
+
 We are working in a paper, until then, the github repository containing the code can be cited:  https://github.com/emilioserra/SugarscapePensions 
 
 ## COPYRIGHT AND LICENSE
@@ -132,4 +144,3 @@ This work is licensed under the Creative Commons Attribution-NonCommercial-Share
 
 Commercial licenses are also available. To inquire about commercial licenses, please contact Emilio Serrano  at https://emilioserra.oeg-upm.net/
 
-<!-- 2009 Cite: Li, J. -->
