@@ -1,12 +1,12 @@
-
 globals [
-  gini-index-reserve
+  gini-index-reserve ;; gini index is calcultated after taxes, based on the wealth of the peope (although it could also measure incomes).
   lorenz-points
   died-working-turtles ;; the amount of turtles who died because lack of sugar
   died-retired-turtles ;; the amount of turtles who died because lack of sugar
   piggy-bank ;; pensions piggy bank
   productivity-decay-list;; list with productivity porcentage for ages from 0 to 100 (101 values).
   social-services-use;; number of uses of social services
+  accumulated-gdp ;; accumulated gross domestic product, sum of the sugar recollected every year before taxes (gdp is accumulated-gdp /ticks)
 ]
 
 turtles-own [
@@ -107,9 +107,16 @@ to go-1000
   print "--------------------RESULTS----------------------"
   print word "Working agents excluded: " died-working-turtles
   print word "Retired agents excluded: " died-retired-turtles
+  print word "Agents excluded: " (died-retired-turtles + died-working-turtles)
+  ;;print word "% Working agents excluded: " (died-working-turtles / ( initial-population * ticks ) )
+  ;;print word "% Retired agents excluded: " ( died-retired-turtles / ( initial-population * ticks ) )
+  ;;print word "% Agents excluded: " ( (died-retired-turtles + died-working-turtles ) / ( initial-population * ticks ) )
   print word "Agents who used social services: "  social-services-use
-  print word "Sugar saved for pensions and social services: "  social-services-use
+  print word "Sugar saved for pensions and social services: "  precision piggy-bank 2
   print word "Gini index: "  precision  ( (gini-index-reserve / count turtles) * 2)  2
+  print word "GDP: "  precision  (   accumulated-gdp / ( ticks + 1) )  2
+
+
 
 end
 
@@ -153,6 +160,7 @@ to go
     if sugar <= 0 and ( not retired ) [set died-working-turtles (died-working-turtles + 1)];; count turtles which die because starvation
     if sugar <= 0 and retired [set died-retired-turtles (died-retired-turtles + 1)];; count turtles which die because starvation
 
+    ;;conditions to die
     if sugar <= 0 or age > max-age [
       hatch 1 [ turtle-setup ]
       die
@@ -200,10 +208,20 @@ to turtle-eat ;; turtle procedure
   ;; taxes go to piggy bank, agent only eats psugar*(1-taxes).
   ;; Moreover, if productivity decay is activated not all the sugar can be retrieved from the patch.
   ;; Useful debugging commands: ask turtles [show sugar] (decimal if taxes are activated), ask patches [show psugar] (decimal if productivity decay)
-  set sugar (sugar - metabolism + (psugar * (1 - pension-taxes / 100) * ifelse-value(productivity-decay)[item age productivity-decay-list][1] ) )
-  set piggy-bank (piggy-bank + (psugar * pension-taxes / 100) * ifelse-value(productivity-decay)[item age productivity-decay-list][1] )
+  ;; Spanish system, you get charged a porcentage of your salary
+  set sugar (sugar - metabolism + ( psugar * (1 - pension-taxes / 100) * ifelse-value(productivity-decay)[item age productivity-decay-list][1] )  )
+  set piggy-bank (piggy-bank +   (psugar * pension-taxes / 100) * ifelse-value(productivity-decay)[item age productivity-decay-list][1] )
+  ;;Japanese system, you get charged a fixed amount (if no sugar to pay it, it is not payed assuming the exemption system)
+  if ( ( sugar - fixed-fee ) > 0 )   ; the agent dies if sugar is equal to 0
+  [
+    set sugar (sugar - fixed-fee)
+    set piggy-bank (piggy-bank + fixed-fee)
+  ]
+  ;; the sugar retreived according to productivity is accumulated in the GDP
+  set accumulated-gdp accumulated-gdp + ( psugar * ifelse-value(productivity-decay)[item age productivity-decay-list][1])
   ;;sugar in the patch is 0 if no productivity decay considered, but if activate, the remainng sugar is still available
   set psugar ifelse-value(productivity-decay)[psugar * ( 1 - ( item age productivity-decay-list ) )][0]
+
 end
 
 to retired-turtle-eat ;; turtle procedure for eat from the pensions piggy bank
@@ -310,10 +328,10 @@ ticks
 30.0
 
 BUTTON
-10
-310
-90
-350
+110
+215
+200
+248
 NIL
 setup
 NIL
@@ -327,10 +345,10 @@ NIL
 1
 
 BUTTON
-100
-310
-190
-350
+110
+250
+200
+283
 NIL
 go
 T
@@ -345,9 +363,9 @@ NIL
 
 BUTTON
 200
-295
+215
 290
-328
+248
 go once
 go
 NIL
@@ -362,9 +380,9 @@ NIL
 
 CHOOSER
 10
-370
+365
 290
-415
+410
 visualization
 visualization
 "no-visualization" "color-agents-by-vision" "color-agents-by-metabolism"
@@ -464,7 +482,7 @@ maximum-sugar-endowment
 maximum-sugar-endowment
 0
 200
-20.0
+25.0
 1
 1
 NIL
@@ -488,7 +506,6 @@ false
 PENS
 "Workers" 1.0 0 -2674135 true "" "plot died-working-turtles"
 "Retirees" 1.0 0 -13345367 true "" "plot died-retired-turtles"
-"Social services use" 1.0 0 -10899396 true "" "plot social-services-use"
 
 SLIDER
 10
@@ -499,7 +516,7 @@ retirement-age
 retirement-age
 0
 100
-60.0
+65.0
 1
 1
 NIL
@@ -507,9 +524,9 @@ HORIZONTAL
 
 SWITCH
 10
-255
-160
-288
+330
+150
+363
 productivity-decay
 productivity-decay
 1
@@ -525,17 +542,17 @@ pension-taxes
 pension-taxes
 0
 100
-10.0
+0.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-165
-215
-315
-248
+150
+290
+290
+323
 resources-occupation
 resources-occupation
 0
@@ -558,7 +575,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -10899396 true "" "plot piggy-bank "
+"Piggy bank" 1.0 0 -10899396 true "" "plot piggy-bank "
 
 PLOT
 960
@@ -581,9 +598,9 @@ PENS
 
 SWITCH
 10
-215
-160
-248
+290
+150
+323
 random-initial-age
 random-initial-age
 0
@@ -591,10 +608,10 @@ random-initial-age
 -1000
 
 SWITCH
-165
-255
-315
-288
+150
+330
+290
+363
 social-services
 social-services
 1
@@ -603,9 +620,9 @@ social-services
 
 BUTTON
 200
-330
+250
 290
-363
+283
 NIL
 go-1000
 NIL
@@ -617,6 +634,21 @@ NIL
 NIL
 NIL
 0
+
+SLIDER
+10
+215
+102
+248
+fixed-fee
+fixed-fee
+0
+4
+0.0
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -679,17 +711,18 @@ The LORENZ CURVE plot shows what percent of the wealth is held by what percent o
 #### Parameters
 * The RETIREMENT-AGE slider states the age of retirement for agents.
 * The  PENSION-TAXES slider states the percentage of sugar collected that goes to the pension piggy bank in each tick.
+* FIXED-FEE slider states a fixed fee of sugar to be paid in every tick to contribute to the pension piggy bank.
 * RANDOM-INITIAL-AGE switch gives a random age to the first population of agents to avoid a first massive wave of retirements when reaching the retirement-age. 
 * PRODUCTIVITY-DECAY switch makes agents to be able to recollect only part of the sugar in a patch based on a productivity-decay rate that depends on the age.  
 * RESOURCES-OCUPPATION switch allows working agents to move to the positions where retired agents stay and collect the sugar.
-* SOCIAL- SERVICES switch allows working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
+* SOCIAL-SERVICES switch allows working agents can get sugar from the piggy bank to avoid dying but, unlike retired agents, after moving and collecting sugar.
 
 
 #### Outputs:
 
 * RETIREES VS WORKERS, plots the number of working agents per time in red and the number of retired agents in blue per time.
 * PENSIONS PIGGY BANK, plots the amount of sugar per time in the pensions piggy bank.
-* SOCIAL EXCLUSION, plots the working agents who run out of sugar in red, the retired agents who run out of sugar in blue, and the working agents that used social services in green.
+* SOCIAL EXCLUSION, plots the working agents who run out of sugar in red, the retired agents who run out of sugar in blue.
 
 ## THINGS TO NOTICE
 
@@ -739,6 +772,17 @@ For more explanation of the Lorenz curve and the Gini index, see the Info tab of
 
 
 ## HOW TO CITE
+Authors: 
+
+*  Emilio Serrano from the Ontology Engineering Group, Deparment of Artificial Intelligence, Universidad Politécnica de Madrid, Spain.
+*  Ken Satoh from Principles of Informatics Research Division, NII(National Institute of Informatics), and Sokendai (The Graduate University of Advanced Studies), Japan.
+ 
+<p align="center"> 
+<img src="https://www.upm.es/sfs/Rectorado/Gabinete%20del%20Rector/Logos/UPM/Escudo%20con%20Leyenda/ESCUDO%20leyenda%20color%20JPG.jpg" width="200">
+<br />
+<img src="https://www.realwire.com/writeitfiles/01_nii_logo_A.jpg" width="200">
+</p>
+
 We are working in a paper, until then, the github repository containing the code can be cited:  https://github.com/emilioserra/SugarscapePensions 
 
 ## COPYRIGHT AND LICENSE
@@ -1039,6 +1083,209 @@ NetLogo 6.1.0
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="initialModelWithPopulationChangeAndRandomInitialAge" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>died-working-turtles ;; the amount of turtles who died because lack of sugar</metric>
+    <metric>(gini-index-reserve / count turtles) * 2</metric>
+    <enumeratedValueSet variable="maximum-sugar-endowment">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="resources-occupation">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="productivity-decay">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pension-taxes">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="minimum-sugar-endowment">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualization">
+      <value value="&quot;no-visualization&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="random-initial-age">
+      <value value="false"/>
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="social-services">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <steppedValueSet variable="initial-population" first="200" step="100" last="600"/>
+    <enumeratedValueSet variable="fixed-fee">
+      <value value="0"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="retirement-age">
+      <value value="100"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="pensionsExperiments" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>precision piggy-bank 2</metric>
+    <metric>precision  (   accumulated-gdp / ( ticks + 1) )  2</metric>
+    <metric>precision  ( (gini-index-reserve / count turtles) * 2)  2</metric>
+    <metric>died-working-turtles</metric>
+    <metric>died-retired-turtles</metric>
+    <metric>(died-retired-turtles + died-working-turtles)</metric>
+    <enumeratedValueSet variable="minimum-sugar-endowment">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maximum-sugar-endowment">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualization">
+      <value value="&quot;no-visualization&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="random-initial-age">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="resources-occupation">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="social-services">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="productivity-decay">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-population">
+      <value value="400"/>
+      <value value="800"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="retirement-age">
+      <value value="100"/>
+      <value value="65"/>
+      <value value="67"/>
+      <value value="70"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pension-taxes">
+      <value value="0"/>
+      <value value="4.7"/>
+      <value value="10"/>
+      <value value="28.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fixed-fee">
+      <value value="0"/>
+      <value value="0.1"/>
+      <value value="0.5"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="pensionsExperimentsWithProductivityDecay" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>precision piggy-bank 2</metric>
+    <metric>precision  (   accumulated-gdp / ( ticks + 1) )  2</metric>
+    <metric>precision  ( (gini-index-reserve / count turtles) * 2)  2</metric>
+    <metric>died-working-turtles</metric>
+    <metric>died-retired-turtles</metric>
+    <metric>(died-retired-turtles + died-working-turtles)</metric>
+    <enumeratedValueSet variable="minimum-sugar-endowment">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maximum-sugar-endowment">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualization">
+      <value value="&quot;no-visualization&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="random-initial-age">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="resources-occupation">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="social-services">
+      <value value="false"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="productivity-decay">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-population">
+      <value value="400"/>
+      <value value="800"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="retirement-age">
+      <value value="100"/>
+      <value value="65"/>
+      <value value="67"/>
+      <value value="70"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pension-taxes">
+      <value value="0"/>
+      <value value="4.7"/>
+      <value value="10"/>
+      <value value="28.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fixed-fee">
+      <value value="0"/>
+      <value value="0.1"/>
+      <value value="0.5"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+  <experiment name="pensionsExperimentsWithProductivityDecayAndSocialServices" repetitions="10" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="1000"/>
+    <metric>precision piggy-bank 2</metric>
+    <metric>precision  (   accumulated-gdp / ( ticks + 1) )  2</metric>
+    <metric>precision  ( (gini-index-reserve / count turtles) * 2)  2</metric>
+    <metric>died-working-turtles</metric>
+    <metric>died-retired-turtles</metric>
+    <metric>(died-retired-turtles + died-working-turtles)</metric>
+    <enumeratedValueSet variable="minimum-sugar-endowment">
+      <value value="5"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="maximum-sugar-endowment">
+      <value value="25"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="visualization">
+      <value value="&quot;no-visualization&quot;"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="random-initial-age">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="resources-occupation">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="social-services">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="productivity-decay">
+      <value value="true"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="initial-population">
+      <value value="400"/>
+      <value value="800"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="retirement-age">
+      <value value="100"/>
+      <value value="65"/>
+      <value value="67"/>
+      <value value="70"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="pension-taxes">
+      <value value="0"/>
+      <value value="4.7"/>
+      <value value="10"/>
+      <value value="28.3"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="fixed-fee">
+      <value value="0"/>
+      <value value="0.1"/>
+      <value value="0.5"/>
+      <value value="1"/>
+    </enumeratedValueSet>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
